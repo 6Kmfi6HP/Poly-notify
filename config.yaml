@@ -1,4 +1,4 @@
-﻿# How often to run a scan loop (seconds).
+# How often to run a scan loop (seconds).
 scan_interval_seconds: 10
 
 api:
@@ -16,7 +16,7 @@ api:
   exclude_review: true # Skip markets/events in review stage.
 
 filters:
-  probability: # Probability bounds (0..1 or 0..100). If >1, it's percent. Examples: 0.002–0.02 = 0.2%–2%, or 0.2–2 = 0.2%–2%.
+  probability: # Probability bounds (0..1 or 0..100). If >1, treated as percent. Examples: 0.002-0.02 = 0.2%-2%, or 0.2-2 = 0.2%-2%.
     enabled: true
     min: 0.4
     max: 2
@@ -50,6 +50,10 @@ telegram: # Telegram Bot API credentials and toggle.
   enabled: false
   chat_id: "<CHAT_ID>"
   token: "<BOT_TOKEN>"
+
+output: # Save alerts to a local file.
+  enabled: true
+  path: "alerts.log"
 
 state: # File to persist last seen prices and timestamps.
   path: "state.json"

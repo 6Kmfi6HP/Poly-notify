@@ -1,3 +1,6 @@
+# Local logs
+alerts.log
+
 # Python cache
 __pycache__/
 *.pyc

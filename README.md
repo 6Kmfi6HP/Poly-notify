@@ -2,6 +2,13 @@
 
 Telegram bot that scans Polymarket (Gamma API), applies filters to market outcomes, and sends alerts based on configured rules.
 
+**What it does**
+- `scanner.py`: fetches data from Polymarket APIs and normalizes outcomes.
+- `filters/`: filters outcomes by probability, liquidity, volume, and time to resolution.
+- `alerts/`: builds messages for new markets, price spikes, and range entry.
+- `notifier.py`: sends messages via Telegram Bot API and/or writes to a local file.
+- `state.py`: persists state to avoid duplicates and track price changes.
+- `main.py`: main loop — scan → filter → alert → save state.
 
 ## Run
 
@@ -18,6 +25,7 @@ pip install -r requirements.txt
 Edit `config.yaml`:
 - `telegram.token` and `telegram.chat_id`
 - `telegram.enabled: true` to enable sending
+- `output.enabled: true` and `output.path` to save alerts to a file
 - filter and alert parameters
 
 ### 3) Start

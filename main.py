@@ -121,10 +121,13 @@ def main() -> None:
     state = StateStore(Path(state_path))
 
     telegram_config = config.get("telegram", {})
+    output_config = config.get("output", {})
     notifier = TelegramNotifier(
         token=telegram_config.get("token", ""),
         chat_id=telegram_config.get("chat_id", ""),
         enabled=telegram_config.get("enabled", False),
+        output_enabled=output_config.get("enabled", False),
+        output_path=output_config.get("path", "alerts.log"),
     )
 
     scan_interval = int(config.get("scan_interval_seconds", 300))
