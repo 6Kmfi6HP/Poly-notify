@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from bot.scanner import OutcomeSnapshot
-from bot.state import OutcomeState
+from scanner import OutcomeSnapshot
+from state import OutcomeState
 
 
 def evaluate(outcome: OutcomeSnapshot, existing_state: OutcomeState | None, config: dict) -> str | None:
@@ -9,12 +9,18 @@ def evaluate(outcome: OutcomeSnapshot, existing_state: OutcomeState | None, conf
         return None
     if existing_state is not None:
         return None
-    return (
-        "🆕 Новый рынок под фильтрами\n"
-        f"Маркет: {outcome.market_name}\n"
-        f"Исход: {outcome.outcome_name}\n"
-        f"Цена: {outcome.price:.4f}\n"
-        f"Ликвидность: ${outcome.liquidity:,.2f}\n"
-        f"Объём: ${outcome.volume:,.2f}\n"
-        f"Ссылка: {outcome.market_url}"
+    price_pct = outcome.price * 100
+    lines = ["🆕 New market matched"]
+    if outcome.event_title and outcome.event_title != outcome.market_name:
+        lines.append(f"Event: {outcome.event_title}")
+    lines.extend(
+        [
+            f"Market: {outcome.market_name}",
+            f"Outcome: {outcome.outcome_name}",
+            f"Price: {price_pct:.2f}%",
+            f"Liquidity: ${outcome.liquidity:,.2f}",
+            f"Volume: ${outcome.volume:,.2f}",
+            f"Link: {outcome.market_url}",
+        ]
     )
+    return "\n".join(lines)

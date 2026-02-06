@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from bot.scanner import OutcomeSnapshot
-from bot.state import OutcomeState
+from scanner import OutcomeSnapshot
+from state import OutcomeState
 
 
 def evaluate(outcome: OutcomeSnapshot, existing_state: OutcomeState | None, config: dict) -> str | None:
@@ -27,6 +27,8 @@ def evaluate(outcome: OutcomeSnapshot, existing_state: OutcomeState | None, conf
 
     percent_change = ((outcome.price - previous_price) / previous_price) * 100
     absolute_change = outcome.price - previous_price
+    previous_price_pct = previous_price * 100
+    current_price_pct = outcome.price * 100
 
     triggered = False
     if threshold_percent:
@@ -37,11 +39,16 @@ def evaluate(outcome: OutcomeSnapshot, existing_state: OutcomeState | None, conf
     if not triggered:
         return None
 
-    return (
-        "⚡ Резкое изменение цены\n"
-        f"Маркет: {outcome.market_name}\n"
-        f"Исход: {outcome.outcome_name}\n"
-        f"Было: {previous_price:.4f} → Стало: {outcome.price:.4f}\n"
-        f"Δ%: {percent_change:+.2f}% (Δ {absolute_change:+.4f})\n"
-        f"Ссылка: {outcome.market_url}"
+    lines = ["⚡ Price spike"]
+    if outcome.event_title and outcome.event_title != outcome.market_name:
+        lines.append(f"Event: {outcome.event_title}")
+    lines.extend(
+        [
+            f"Market: {outcome.market_name}",
+            f"Outcome: {outcome.outcome_name}",
+            f"Was: {previous_price_pct:.2f}% → Now: {current_price_pct:.2f}%",
+            f"Δ%: {percent_change:+.2f}% (Δ {absolute_change:+.4f})",
+            f"Link: {outcome.market_url}",
+        ]
     )
+    return "\n".join(lines)

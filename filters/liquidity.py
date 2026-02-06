@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from bot.scanner import OutcomeSnapshot
+from scanner import OutcomeSnapshot
 
 
 def passes(outcome: OutcomeSnapshot, config: dict) -> bool:

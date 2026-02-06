@@ -1,0 +1,9 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Virtual env
+venv/
+
+# Local state/config
+state.json

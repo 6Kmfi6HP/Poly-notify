@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from bot.scanner import OutcomeSnapshot
-from bot.state import OutcomeState
+from filters.probability import _normalize_bounds
+from scanner import OutcomeSnapshot
+from state import OutcomeState
 
 
 def evaluate(
@@ -15,16 +16,24 @@ def evaluate(
     if existing_state is None or existing_state.last_seen_price is None:
         return None
 
-    min_prob = float(probability_config.get("min", 0))
-    max_prob = float(probability_config.get("max", 1))
+    min_prob, max_prob = _normalize_bounds(probability_config)
 
     if existing_state.last_seen_price > max_prob and min_prob <= outcome.price <= max_prob:
-        return (
-            "🎯 Вход цены в диапазон\n"
-            f"Маркет: {outcome.market_name}\n"
-            f"Исход: {outcome.outcome_name}\n"
-            f"Было: {existing_state.last_seen_price:.4f} → Стало: {outcome.price:.4f}\n"
-            f"Диапазон: [{min_prob:.4f}, {max_prob:.4f}]\n"
-            f"Ссылка: {outcome.market_url}"
+        previous_price_pct = existing_state.last_seen_price * 100
+        current_price_pct = outcome.price * 100
+        min_prob_pct = min_prob * 100
+        max_prob_pct = max_prob * 100
+        lines = ["🎯 Price entered range"]
+        if outcome.event_title and outcome.event_title != outcome.market_name:
+            lines.append(f"Event: {outcome.event_title}")
+        lines.extend(
+            [
+                f"Market: {outcome.market_name}",
+                f"Outcome: {outcome.outcome_name}",
+                f"Was: {previous_price_pct:.2f}% → Now: {current_price_pct:.2f}%",
+                f"Range: [{min_prob_pct:.2f}%, {max_prob_pct:.2f}%]",
+                f"Link: {outcome.market_url}",
+            ]
         )
+        return "\n".join(lines)
     return None

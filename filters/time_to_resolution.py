@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from bot.scanner import OutcomeSnapshot
+from scanner import OutcomeSnapshot
 
 
 def passes(outcome: OutcomeSnapshot, config: dict) -> bool:

@@ -1,44 +1,55 @@
-scan_interval_seconds: 300
+﻿# How often to run a scan loop (seconds).
+scan_interval_seconds: 10
+
 api:
-  base_url: "https://polymarket.com/api"
-  markets_endpoint: "/markets"
-  active_only: true
+  base_url: "https://gamma-api.polymarket.com" # Gamma API base URL.
+  markets_endpoint: "/events" # Endpoint for events.
+  active_only: true # Only active and not closed events.
+  limit: 100 # Max number of events per request.
+  timeout_seconds: 5 # HTTP timeout (seconds).
+  max_retries: 3 # Retries on network errors.
+  retry_backoff_seconds: 2.0 # Backoff between retries.
+  use_clob_prices: false # Use CLOB prices instead of Gamma outcomePrices.
+  clob_base_url: "https://clob.polymarket.com" # CLOB API base URL.
+  clob_price_side: "BUY" # Price side for CLOB.
+  clob_batch_size: 200 # Batch size for CLOB /prices.
+  exclude_review: true # Skip markets/events in review stage.
 
 filters:
-  probability:
+  probability: # Probability bounds (0..1 or 0..100). If >1, it's percent. Examples: 0.002–0.02 = 0.2%–2%, or 0.2–2 = 0.2%–2%.
     enabled: true
-    min: 0.002
-    max: 0.01
+    min: 0.4
+    max: 2
 
-  time_to_resolution:
-    enabled: true
-    min_days: 7
-    max_days: 180
+  time_to_resolution: # Time to resolution in days.
+    enabled: false
+    min_days: 1
+    max_days: 30
 
-  liquidity:
-    enabled: true
+  liquidity: # Minimum liquidity (USD).
+    enabled: false
     min_usd: 5000
 
-  volume:
+  volume: # Minimum volume (USD).
     enabled: false
     min_usd: 1000
 
 alerts:
-  new_market:
+  new_market: # Alert when a new market matches filters.
     enabled: true
 
-  price_spike:
+  price_spike: # Alert on price change over a lookback window.
     enabled: true
-    percent_change: 30
+    percent_change: 20
     lookback_minutes: 60
 
-  range_entry:
+  range_entry: # Alert when price enters the probability range.
     enabled: true
 
-telegram:
-  enabled: true
+telegram: # Telegram Bot API credentials and toggle.
+  enabled: false
   chat_id: "<CHAT_ID>"
   token: "<BOT_TOKEN>"
 
-state:
+state: # File to persist last seen prices and timestamps.
   path: "state.json"
