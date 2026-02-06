@@ -1,0 +1,44 @@
+scan_interval_seconds: 300
+api:
+  base_url: "https://polymarket.com/api"
+  markets_endpoint: "/markets"
+  active_only: true
+
+filters:
+  probability:
+    enabled: true
+    min: 0.002
+    max: 0.01
+
+  time_to_resolution:
+    enabled: true
+    min_days: 7
+    max_days: 180
+
+  liquidity:
+    enabled: true
+    min_usd: 5000
+
+  volume:
+    enabled: false
+    min_usd: 1000
+
+alerts:
+  new_market:
+    enabled: true
+
+  price_spike:
+    enabled: true
+    percent_change: 30
+    lookback_minutes: 60
+
+  range_entry:
+    enabled: true
+
+telegram:
+  enabled: true
+  chat_id: "<CHAT_ID>"
+  token: "<BOT_TOKEN>"
+
+state:
+  path: "state.json"
