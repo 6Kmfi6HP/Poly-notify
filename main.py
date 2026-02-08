@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -15,7 +16,29 @@ from state import StateStore
 
 
 def load_config(path: str) -> dict:
-    return yaml.safe_load(Path(path).read_text())
+    """Load config from YAML file and apply environment variable overrides."""
+    config = yaml.safe_load(Path(path).read_text())
+    
+    # Environment variable overrides for Docker deployment
+    if os.environ.get("TELEGRAM_BOT_TOKEN"):
+        config.setdefault("telegram", {})["token"] = os.environ["TELEGRAM_BOT_TOKEN"]
+    if os.environ.get("TELEGRAM_CHAT_ID"):
+        config.setdefault("telegram", {})["chat_id"] = os.environ["TELEGRAM_CHAT_ID"]
+    if os.environ.get("TELEGRAM_ENABLED"):
+        config.setdefault("telegram", {})["enabled"] = os.environ["TELEGRAM_ENABLED"].lower() in ("true", "1", "yes")
+    if os.environ.get("STATE_PATH"):
+        config.setdefault("state", {})["path"] = os.environ["STATE_PATH"]
+    if os.environ.get("SCAN_INTERVAL"):
+        config["scan_interval_seconds"] = int(os.environ["SCAN_INTERVAL"])
+    
+    # Auto-enable telegram if token and chat_id are provided
+    telegram_cfg = config.get("telegram", {})
+    if telegram_cfg.get("token") and telegram_cfg.get("chat_id"):
+        if "enabled" not in telegram_cfg or not telegram_cfg["enabled"]:
+            telegram_cfg["enabled"] = True
+            config["telegram"] = telegram_cfg
+    
+    return config
 
 
 def passes_filters(outcome: OutcomeSnapshot, filters_config: dict) -> bool:
@@ -101,7 +124,8 @@ def run_once(config: dict, scanner: PolymarketScanner, state: StateStore, notifi
 
 
 def main() -> None:
-    config = load_config("config.yaml")
+    config_path = os.environ.get("CONFIG_PATH", "config.yaml")
+    config = load_config(config_path)
     api_config = config.get("api", {})
     scanner = PolymarketScanner(
         base_url=api_config.get("base_url", "https://gamma-api.polymarket.com"),
