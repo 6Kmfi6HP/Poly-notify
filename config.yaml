@@ -46,6 +46,27 @@ alerts:
   range_entry: # Alert when price enters the probability range.
     enabled: true
 
+  whale_trade: # Alert on large trades (whale detection via CLOB trades API).
+    enabled: true
+    min_usd: 10000
+    notify_new_wallet: true
+
+  insider_detection:
+    enabled: true
+    new_wallet_age_hours: 24
+    single_market_focus: true
+    min_volume_usd: 5000
+
+  volume_spike:
+    enabled: true
+    percent_change: 200
+    lookback_minutes: 30
+    baseline_days: 7
+
+wallet_tracking:
+  enabled: true
+  retention_days: 30
+
 telegram: # Telegram Bot API credentials and toggle.
   enabled: false
   chat_id: "<CHAT_ID>"
